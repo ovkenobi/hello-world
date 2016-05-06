@@ -2,12 +2,6 @@ import requests
 import re
 from datetime import datetime
 from json import dumps
-'''
-https://gist.github.com/jefftriplett/9748036
-https://www.ipify.org/
-https://stackoverflow.com/questions/10967631/how-to-make-http-request-through-a-tor-socks-proxy-using-python
-'''
-
 
 headerPost = {'Host': 'auto.e1.ru',
               'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:46.0) Gecko/20100101 Firefox/46.0',
@@ -92,19 +86,35 @@ def e1_auto_info(url):
     res['city']=find_param(r"Характеристики.+?[Гг]ород.+?au-offer-card__tech-txt.+?<", r.text)
     
     # ---- price
-    res['price']=find_param(r"Характеристики.+?[Цц]ена.+?au-offer-card__tech-txt.+?strong.+?<", r.text)
+    res['price']=find_param(r"Характеристики.+?[Цц]ена.+?au-offer-card__tech-txt.+?strong.+?<", r.text).replace("&nbsp;",'')
     
     # ---- phone
     res['phone']=e1_auto_phone_number(int(res['id']))
     
     return res
-    
-    
+
+def all_href_car(url):
+    l=[]
+    r=requests.get(url,headers={'Host':'auto.e1.ru',
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:46.0) Gecko/20100101 Firefox/46.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3',
+            'Accept-Encoding': 'gzip, deflate',
+            'Cookie': 'ngs_ttq=u:7ab7b9cd7017c3a1b331f8030bf1bf55; ngs_uid=w127Clcq97gyuAyVA8NYAg==; isMobile=false; _ym_uid=1462433727342287192; _ym_visorc_24038521=w; _ym_isad=2; __utma=8453157.762694507.1462433727.1462433727.1462433727.1; __utmb=8453157.6.10.1462433727; __utmc=8453157; __utmz=8453157.1462433727.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); ngs_avc=9; RT=; doh=10; region_location=%5B213%5D; location=%7B%22type%22%3A%22region%22%2C%22value%22%3A%5B213%5D%7D; search_offers_persistent=a%3A3%3A%7Bs%3A8%3A%22currency%22%3Bs%3A3%3A%22rur%22%3Bs%3A5%3A%22limit%22%3Bi%3A20%3Bs%3A4%3A%22sort%22%3Ba%3A16%3A%7Bs%3A2%3A%22id%22%3BN%3Bs%3A4%3A%22date%22%3BN%3Bs%3A14%3A%22date_and_price%22%3BN%3Bs%3A10%3A%22mark_model%22%3BN%3Bs%3A4%3A%22year%22%3BN%3Bs%3A10%3A%22horsepower%22%3BN%3Bs%3A12%3A%22transmission%22%3BN%3Bs%3A6%3A%22engine%22%3BN%3Bs%3A8%3A%22capacity%22%3BN%3Bs%3A11%3A%22engine_type%22%3BN%3Bs%3A5%3A%22wheel%22%3BN%3Bs%3A4%3A%22city%22%3BN%3Bs%3A8%3A%22run_size%22%3BN%3Bs%3A4%3A%22gear%22%3BN%3Bs%3A5%3A%22price%22%3BN%3Bs%3A11%3A%22views_total%22%3BN%3B%7D%7D; search_offers=a%3A0%3A%7B%7D; search_window=table; presentationListHide=true; __utmt=1',
+            'Connection': 'keep-alive',
+            'Cache-Control': 'max-age=0'})
+    if r.status_code == 200:
+        for link in re.findall("au-elements__title__link_table.+?>", r.text, re.DOTALL):
+            match=re.search("href=[\'\"].+?[\'\"]", link)
+            if match:
+                i,j=match.span()
+                l.append(link[i+6:j-1])
+    return l
+
+
 def main():
-    for url in ["http://auto.e1.ru/car/used/opel/opel_astra/7511983",
-                "http://auto.e1.ru/car/used/daewoo/espero/7819237",
-                "http://auto.e1.ru/car/used/toyota/corolla/7794958"]:
-        print(e1_auto_info(url))
+    for link in all_href_car("http://auto.e1.ru/car/foreign/?region[]=213"):
+        print(e1_auto_info("http://auto.e1.ru"+link))
 
 if __name__ == "__main__":
     main()
