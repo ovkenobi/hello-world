@@ -18,7 +18,7 @@ def check_proxy2(ip, port):
     url = 'http://ip-detect.ru/'
     proxy_handler = request.ProxyHandler({'http': 'http://{}:{}'.format(ip,port)})
     opener = request.build_opener(proxy_handler)
-    try: t = opener.open(url).readall().decode()
+    try: t = opener.open(url, timeout=5).readall().decode()
     except: t = None
     if t:
         match = re.search(r'<div.+?my_ip".*?>.+?</div>', t)
@@ -37,7 +37,7 @@ def check_proxy3(ip, port):
            "https://api.ipify.org"]
     
     for site in my_ip:
-        try: t=opener.open(site).readall().decode()
+        try: t=opener.open(site, timeout=5).readall().decode()
         except: return False
         if ip not in t: return False
         return True
