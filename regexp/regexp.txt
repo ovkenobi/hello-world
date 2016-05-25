@@ -1,3 +1,6 @@
-[\w-_.]{1,64}@[\w-_.]{1,32}\.[\w]{2,5}
+[\w-_.]{1,64}@[\w-_]{1,32}\.(ru|org|com|net|su|uk)+?
+[\w-_.]{1,64}@[\w-_]{1,32}\.\w{2,6}
 
 ^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$
+
+http://verify-email.org/index.php?check=asdadsaopijosdjf123.asd%40maiasdasd-sdfasdf23-sl.ru&option=com_emailverifier&view=emailverifier&layout=verify&format=raw&9cd0775765e0d4f1a13c26c829e7bf86=1&submitEmail=Verify

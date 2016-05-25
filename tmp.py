@@ -25,6 +25,7 @@ def load_page(iter_links, iter_proxy, need_head=False):
             except http.client.HTTPException as e: print("HTTPException =", e)
             except error.HTTPError as e: print('HTTPError =', e)
             except error.URLError as e: print("URLError =", e)
+            except Exception as e: print("Exception =", e)
             if text is None:
                 err_num +=1
                 if err_num > 3: break
